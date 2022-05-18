@@ -1,5 +1,5 @@
 from questrade_helper import Portfolio
 
-TFSA = Portfolio(account_type='TFSA')
+OUTPUT = Portfolio(account_type='TFSA', cash_injection=4000.00, cash_injection_cad=True)
 
-print(TFSA.final_output.T)
+print(OUTPUT.final_output.T)
