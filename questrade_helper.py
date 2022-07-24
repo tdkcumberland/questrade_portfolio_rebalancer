@@ -11,6 +11,9 @@ class Portfolio():
         cash_injection_cad: bool=False, 
         refresh_token:str=None
         ):
+
+        pd.set_option('display.float_format', '{:.2f}'.format)
+
         self.questrade_client = Questrade(refresh_token = refresh_token) if refresh_token else Questrade()
         self.account = self.get_account(self.questrade_client.accounts,account_type)
         self.account_positions: pd.DataFrame = pd.DataFrame.from_dict(self.questrade_client.account_positions(self.account)['positions'])
@@ -21,7 +24,7 @@ class Portfolio():
         self.account_calculations()
         self.over_allocation = self.get_overall_allocation()
         self.final_output = self.account_positions[['openQuantity', 'averageEntryPrice','averagePrice', 'totalCost','currentMarketValue','openPnl','%PnL','%portfolio','%target_portfolio', 'balancer', 'balancer-CAD', 'buy-sell', 'shares-count']]
-
+        self.final_output = self.final_output.sort_values('%PnL', ascending=True)
         print("Balance check (should be zero): " + str(self.account_positions['balancer'].sum()))
         print("Target composition check (should be 100): " + str(self.account_positions['%target_portfolio'].sum()))
 

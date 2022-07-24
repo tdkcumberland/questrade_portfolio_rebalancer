@@ -10,6 +10,7 @@ def main():
 
     OUTPUT = Portfolio(account_type=args.account_type, cash_injection=args.cash_injection, cash_injection_cad=True, refresh_token=args.refresh_token)
     print(OUTPUT.final_output.T)
+    print("Current exchange rate USD to CAD: {:.2f}".format(OUTPUT.exchange_rate_USD_CAD))
 
 if __name__=="__main__":
     main()
