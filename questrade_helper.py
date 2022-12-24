@@ -29,7 +29,8 @@ class Portfolio():
         print("Target composition check (should be 100): " + str(self.account_positions['%target_portfolio'].sum()))
 
     def get_overall_allocation(self):
-        _ = self.account_positions.groupby(['assetClass']).sum()
+        _ = self.account_positions.groupby(['assetClass']).sum(numeric_only=False)
+        print(_)
         _['%PnL'] = _['openPnl']/_['totalCost']*100
         return _
 
@@ -125,7 +126,8 @@ class Portfolio():
         self.account_positions = self.account_positions.sort_values(by='openPnl', ascending=False)
         
         # append cash row and a bunch more empty columns
-        self.account_positions = self.account_positions.append(self.cash_row)
+        cash_flow_df = pd.DataFrame(self.cash_row)
+        self.account_positions = pd.concat([self.account_positions, cash_flow_df.T])
         self.account_positions['assetClass'] = nan
         self.account_positions['%target_portfolio'] = nan
         self.account_positions['balancer'] = nan
