@@ -30,7 +30,6 @@ class Portfolio():
 
     def get_overall_allocation(self):
         _ = self.account_positions.groupby(['assetClass']).sum(numeric_only=False)
-        print(_)
         _['%PnL'] = _['openPnl']/_['totalCost']*100
         return _
 
@@ -66,7 +65,7 @@ class Portfolio():
             current_composition.append(symbol)
         
         for target in target_composition():
-            # if the symbol is not in the curret positions, find it and add it the relevant info as row into the df
+            # if the symbol is not in the current positions, find it and add it the relevant info as row into the df
             if target not in current_composition:
                 target_id, target_last_trade_price = self.search_for_last_trade_price_by_symbol(symbol= target)
                 row = pd.Series({
