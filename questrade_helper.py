@@ -91,7 +91,7 @@ class Portfolio():
                 self.account_positions.loc[target, '%target_portfolio'] = target_percent().get(target)
 
     def get_cash_as_account_row(self, cash_injection:float=0., cash_injection_cad:bool=False):
-        if cash_injection > 0:
+        if cash_injection != 0:
             cash_injection_in_USD = cash_injection if not cash_injection_cad else cash_injection/self.exchange_rate_USD_CAD
             self.cash_value = cash_injection_in_USD + self.account_balances.loc['USD', 'cash']
             self.account_balances.loc['USD', 'totalEquity'] = self.account_balances.loc['USD', 'totalEquity'] + cash_injection_in_USD
