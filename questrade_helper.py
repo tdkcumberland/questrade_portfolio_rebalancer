@@ -25,8 +25,8 @@ class Portfolio():
         self.over_allocation = self.get_overall_allocation()
         self.final_output = self.account_positions[['openQuantity', 'averageEntryPrice','averagePrice', 'totalCost','currentMarketValue','openPnl','%PnL','%portfolio','%target_portfolio', 'balancer', 'balancer-CAD', 'buy-sell', 'shares-count']]
         self.final_output = self.final_output.sort_values('%PnL', ascending=True)
-        print("Balance check (should be zero): " + str(self.account_positions['balancer'].sum()))
-        print("Target composition check (should be 100): " + str(self.account_positions['%target_portfolio'].sum()))
+        print("Balance check (should be zero): {:.2f}".format(self.account_positions['balancer'].sum()))
+        print("Target composition check (should be 100): {:.2f}".format(self.account_positions['%target_portfolio'].sum()))
 
     def get_overall_allocation(self):
         _ = self.account_positions.groupby(['assetClass']).sum(numeric_only=False)

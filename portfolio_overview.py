@@ -14,6 +14,7 @@ def main():
     if args.account_type and not args.symbol_search:
         OUTPUT = Portfolio(account_type=args.account_type, cash_injection=args.cash_injection, cash_injection_cad=args.cash_injection_cad, refresh_token=args.refresh_token)
         print(OUTPUT.final_output.T)
+        
         print("Current exchange rate USD to CAD: {:.4f}".format(OUTPUT.exchange_rate_USD_CAD))
     elif args.symbol_search and not args.account_type:
         Symbol(symbol = args.symbol_search, refresh_token = args.refresh_token)
