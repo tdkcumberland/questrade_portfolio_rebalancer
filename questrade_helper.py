@@ -9,12 +9,14 @@ class Portfolio():
         account_type:str, 
         cash_injection: float=0., 
         cash_injection_cad: bool=False, 
-        refresh_token:str=None
+        refresh_token:str=None,
+        no_cash_mode:bool=False
         ):
 
         pd.set_option('display.float_format', '{:.2f}'.format)
 
         self.questrade_client = Questrade(refresh_token = refresh_token) if refresh_token else Questrade()
+        self.no_cash_mode=no_cash_mode
         self.account = self.get_account(self.questrade_client.accounts,account_type)
         self.account_positions: pd.DataFrame = pd.DataFrame.from_dict(self.questrade_client.account_positions(self.account)['positions'])
         self.account_balances: pd.DataFrame = pd.DataFrame.from_dict(self.questrade_client.account_balances(self.account)['combinedBalances'])
@@ -91,7 +93,10 @@ class Portfolio():
                 self.account_positions.loc[target, '%target_portfolio'] = target_percent().get(target)
 
     def get_cash_as_account_row(self, cash_injection:float=0., cash_injection_cad:bool=False):
-        if cash_injection != 0:
+        if self.no_cash_mode:
+            self.cash_value = 0
+            self.account_balances.loc['USD', 'totalEquity'] = self.account_balances.loc['USD', 'totalEquity'] - self.account_balances.loc['USD', 'cash']
+        elif cash_injection != 0:
             cash_injection_in_USD = cash_injection if not cash_injection_cad else cash_injection/self.exchange_rate_USD_CAD
             self.cash_value = cash_injection_in_USD + self.account_balances.loc['USD', 'cash']
             self.account_balances.loc['USD', 'totalEquity'] = self.account_balances.loc['USD', 'totalEquity'] + cash_injection_in_USD

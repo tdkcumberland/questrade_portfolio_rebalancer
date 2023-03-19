@@ -9,10 +9,16 @@ def main():
     parser.add_argument('-e', '--exchange', dest="cash_injection_cad", type=str2bool, help="define what the cash injection's currency is, true = CAD, false = USD", default=True )
     parser.add_argument('-r', '--refresh-token', dest='refresh_token', type=str, help="refresh token for API")
     parser.add_argument('-s', '--symbol', dest="symbol_search", type=str, help="symbol or ticker to perform a search")
+    parser.add_argument('-n', '--no-cash-mode', dest="no_cash_mode", type=str2bool, help="the account is treated as if there's no cash in the account, a pure re-balance")
     args = parser.parse_args()
 
     if args.account_type and not args.symbol_search:
-        OUTPUT = Portfolio(account_type=args.account_type, cash_injection=args.cash_injection, cash_injection_cad=args.cash_injection_cad, refresh_token=args.refresh_token)
+        OUTPUT = Portfolio(
+            account_type=args.account_type, 
+            cash_injection=args.cash_injection, 
+            cash_injection_cad=args.cash_injection_cad, 
+            refresh_token=args.refresh_token,
+            no_cash_mode=args.no_cash_mode)
         print(OUTPUT.final_output.T)
         
         print("Current exchange rate USD to CAD: {:.4f}".format(OUTPUT.exchange_rate_USD_CAD))
