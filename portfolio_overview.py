@@ -12,8 +12,8 @@ def main():
     parser.add_argument('-s', '--symbol', dest="symbol_search", type=str, help="symbol or ticker to perform a search")
     parser.add_argument('-n', '--no-cash-mode', dest="no_cash_mode", type=str2bool, help="the account is treated as if there's no cash in the account, a pure re-balance")
     args = parser.parse_args()
-    
-    if len(args._get_args()) < 1:
+
+    if len(sys.argv) < 3:
         print("Required at least one argument please see usage below")
         print("=====================================================")
         parser.print_help()
