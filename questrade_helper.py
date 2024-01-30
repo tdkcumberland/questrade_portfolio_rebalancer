@@ -14,21 +14,33 @@ class Portfolio():
         ):
 
         pd.set_option('display.float_format', '{:.2f}'.format)
-
+        print("Retrieving account position")
         self.questrade_client = Questrade(refresh_token = refresh_token) if refresh_token else Questrade()
         self.no_cash_mode=no_cash_mode
         self.account = self.get_account(self.questrade_client.accounts,account_type)
         self.account_positions: pd.DataFrame = pd.DataFrame.from_dict(self.questrade_client.account_positions(self.account)['positions'])
         self.account_balances: pd.DataFrame = pd.DataFrame.from_dict(self.questrade_client.account_balances(self.account)['combinedBalances'])
+        print("Clearing recently liquidated position")
+        self.clear_recently_liquidated_position()
         self.account_balances = self.account_balances.set_index('currency')
         self.exchange_rate_USD_CAD = self.account_balances.loc['CAD', 'totalEquity']/self.account_balances.loc['USD', 'totalEquity']
+        print("Retrieving acount's cash")
         self.cash_row = self.get_cash_as_account_row(cash_injection=cash_injection, cash_injection_cad=cash_injection_cad)
+        print("Calculating...")
         self.account_calculations()
         self.over_allocation = self.get_overall_allocation()
         self.final_output = self.account_positions[['openQuantity', 'averageEntryPrice','averagePrice', 'totalCost','currentMarketValue','openPnl','%PnL','%portfolio','%target_portfolio', 'balancer', 'balancer-CAD', 'buy-sell', 'shares-count']]
         self.final_output = self.final_output.sort_values('%PnL', ascending=True)
         print("Balance check (should be zero): {:.2f}".format(self.account_positions['balancer'].sum()))
         print("Target composition check (should be 100): {:.2f}".format(self.account_positions['%target_portfolio'].sum()))
+
+    def clear_recently_liquidated_position(self):
+        # recently liquidated position has NaN in the dataframe which can cause errors during downstream calculation
+        # filter out rows with zero open quantity > 0
+        self.account_positions = self.account_positions.loc[
+            (self.account_positions['openQuantity'] > 0) & 
+            (self.account_positions['totalCost'].notnull())
+            ]
 
     def get_overall_allocation(self):
         _ = self.account_positions.groupby(['assetClass']).sum(numeric_only=False)
@@ -88,7 +100,7 @@ class Portfolio():
                                 'shares-count': 0,
                                 'balancer-CAD': 0,
                                 },name=(target,target_id))
-                self.account_positions = self.account_positions.append(row)
+                self.account_positions = self.account_positions._append(row)
             else:
                 self.account_positions.loc[target, '%target_portfolio'] = target_percent().get(target)
 

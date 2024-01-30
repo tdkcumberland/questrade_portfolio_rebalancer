@@ -7,8 +7,14 @@ FIXED_INCOME = ['RYLD', 'QYLD', 'XYLD', 'SVOL']
 EQUITY = ['SPYC', 'SCHH','FTEC','EBLU','XHB','FHLC','FSTA','FUTY','FIDU','FNCL','FMAT','FDIS','FENY','FCOM','CNRG']
 LONG_VOL = ['PFIX', 'IVOL']
 
-TARGET_COMPOSITION = ["Cash", "PDBC","BAR", "IVOL", "PFIX", "XYLD", "RYLD", "SVOL", "SPYC"]
-TARGET_PERCENT = [0, 18, 19, 10.5, 10.5, 6, 6, 6, 24]
+# TARGET_COMPOSITION = ["Cash", "XYLD", "RYLD", "SVOL", "SPYC", 
+#                       "TSLY", "NVDY", "GOOY", "MSFO", "AMZY", "APLY"]
+# TARGET_PERCENT = [0, 25, 6, 6, 6, 30, 4.5, 4.5, 4.5, 4.5, 4.5, 4.5]
+TARGET_COMPOSITION = ["Cash", "XYLD", "RYLD", "SVOL", "SPYC", 
+                      "TSLY", "NVDY", "GOOY", "MSFO", "AMZY", "APLY",
+                      "TSLA", "NVDA", "GOOG", "MSFT", "AMZN", "AAPL"
+                      ]
+TARGET_PERCENT = [0, 6, 6, 6, 24, 4, 4, 4, 4, 4, 4, 5.67, 5.67, 5.67, 5.67, 5.67, 5.65]
 
 TARGET_PERCENT = dict(zip(TARGET_COMPOSITION,TARGET_PERCENT))
 

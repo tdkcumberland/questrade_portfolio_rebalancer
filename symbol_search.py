@@ -2,8 +2,6 @@ from questrade_api.questrade import Questrade
 
 import pandas as pd
 
-q = Questrade()
-
 symbol = "PFIX"
 
 class Symbol():
@@ -13,10 +11,10 @@ class Symbol():
 
     def search(self, symbol: str):
 
-        self.search_symbol = q.symbols_search(prefix = symbol, offset = 0)
+        self.search_symbol = self.questrade_client.symbols_search(prefix = symbol, offset = 0)
 
         if self.search_symbol['symbols']:
-            self.symbol_search_result = q.markets_quote(self.search_symbol['symbols'][0]['symbolId'])
+            self.symbol_search_result = self.questrade_client.markets_quote(self.search_symbol['symbols'][0]['symbolId'])
             print(self.symbol_search_result['quotes'][0])
             df = pd.DataFrame(self.symbol_search_result['quotes'][0], index = ['symbol'])
             print(df.T)
