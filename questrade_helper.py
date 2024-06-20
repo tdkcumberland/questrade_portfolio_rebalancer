@@ -28,7 +28,7 @@ class Portfolio():
         self.cash_row = self.get_cash_as_account_row(cash_injection=cash_injection, cash_injection_cad=cash_injection_cad)
         print("Calculating...")
         self.account_calculations()
-        self.over_allocation = self.get_overall_allocation()
+        # self.over_allocation = self.get_overall_allocation()
         self.final_output = self.account_positions[['openQuantity', 'averageEntryPrice','averagePrice', 'totalCost','currentMarketValue','openPnl','%PnL','%portfolio','%target_portfolio', 'balancer', 'balancer-CAD', 'buy-sell', 'shares-count']]
         self.final_output = self.final_output.sort_values('%PnL', ascending=True)
         print("Balance check (should be zero): {:.2f}".format(self.account_positions['balancer'].sum()))
@@ -37,10 +37,15 @@ class Portfolio():
     def clear_recently_liquidated_position(self):
         # recently liquidated position has NaN in the dataframe which can cause errors during downstream calculation
         # filter out rows with zero open quantity > 0
-        self.account_positions = self.account_positions.loc[
-            (self.account_positions['openQuantity'] > 0) & 
-            (self.account_positions['totalCost'].notnull())
-            ]
+        if not self.account_positions.empty:
+            self.account_positions = self.account_positions.loc[
+                (self.account_positions['openQuantity'] > 0) & 
+                (self.account_positions['totalCost'].notnull())
+                ]
+            self.no_position = False
+        else:
+            # this indicates that this account has not positions and may have cash only
+            self.no_position = True
 
     def get_overall_allocation(self):
         _ = self.account_positions.groupby(['assetClass']).sum(numeric_only=False)
@@ -134,13 +139,14 @@ class Portfolio():
                         },name=('Cash',-1))
 
     def account_calculations(self):
-        self.account_positions = self.account_positions.groupby(['symbol','symbolId'])[['openQuantity','openPnl','totalCost','currentMarketValue']].sum()
-        self.account_positions['averageEntryPrice'] = self.account_positions['totalCost']/self.account_positions['openQuantity']
-        self.account_positions['averagePrice'] = self.account_positions['currentMarketValue']/self.account_positions['openQuantity']
-        self.account_positions['%PnL'] = (self.account_positions['currentMarketValue'] - self.account_positions['totalCost'])/self.account_positions['totalCost']*100
-        
-        self.account_positions = self.account_positions.sort_values(by='openPnl', ascending=False)
-        
+        if not self.no_position:
+            self.account_positions = self.account_positions.groupby(['symbol','symbolId'])[['openQuantity','openPnl','totalCost','currentMarketValue']].sum()
+            self.account_positions['averageEntryPrice'] = self.account_positions['totalCost']/self.account_positions['openQuantity']
+            self.account_positions['averagePrice'] = self.account_positions['currentMarketValue']/self.account_positions['openQuantity']
+            self.account_positions['%PnL'] = (self.account_positions['currentMarketValue'] - self.account_positions['totalCost'])/self.account_positions['totalCost']*100
+            
+            self.account_positions = self.account_positions.sort_values(by='openPnl', ascending=False)
+            
         # append cash row and a bunch more empty columns
         cash_flow_df = pd.DataFrame(self.cash_row)
         self.account_positions = pd.concat([self.account_positions, cash_flow_df.T])
